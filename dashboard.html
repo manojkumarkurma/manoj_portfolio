@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Analytics Dashboard | MKK Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --card: #16161f;
+    --card-hover: #1c1c28;
+    --border: rgba(255,255,255,0.07);
+    --border-bright: rgba(255,255,255,0.12);
+    --accent: #7c6cfa;
+    --accent-dim: rgba(124,108,250,0.15);
+    --accent2: #36d5a8;
+    --accent2-dim: rgba(54,213,168,0.12);
+    --accent3: #f0884a;
+    --accent3-dim: rgba(240,136,74,0.12);
+    --accent4: #e06c9a;
+    --accent4-dim: rgba(224,108,154,0.12);
+    --text: #f0effe;
+    --muted: #8884a8;
+    --muted-dim: #5c5878;
+    --tag-bg: rgba(124,108,250,0.12);
+    --tag-border: rgba(124,108,250,0.3);
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 3rem;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem; color: var(--accent); letter-spacing: 0.06em;
+  }
+  .nav-logo a { color: inherit; text-decoration: none; }
+  .nav-right { display: flex; align-items: center; gap: 2rem; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.82rem; color: var(--muted); text-decoration: none;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--text); }
+  .nav-links a.active { color: var(--accent); }
+  .live-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--accent2);
+    display: inline-block; animation: pulse 1.8s ease-in-out infinite;
+    margin-right: 6px;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* LAYOUT */
+  .dashboard-wrapper {
+    padding: 6.5rem 2rem 3rem;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  /* HEADER */
+  .dash-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+  }
+  .dash-title-group {}
+  .dash-label {
+    font-family: 'DM Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+  .dash-title {
+    font-size: clamp(1.6rem, 3.5vw, 2.2rem); font-weight: 700;
+    letter-spacing: -0.02em; line-height: 1.2;
+  }
+  .dash-title span { color: var(--muted); font-weight: 400; font-size: 0.7em; }
+
+  /* PERIOD SELECTOR */
+  .period-selector {
+    display: flex; gap: 4px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 4px;
+  }
+  .period-btn {
+    font-family: 'DM Mono', monospace; font-size: 0.73rem;
+    padding: 6px 16px; border-radius: 7px; border: none;
+    background: transparent; color: var(--muted); cursor: pointer;
+    transition: all 0.2s; letter-spacing: 0.03em;
+  }
+  .period-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+  .period-btn.active {
+    background: var(--accent); color: #fff; font-weight: 500;
+  }
+
+  /* KPI CARDS */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.4rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .kpi-card:hover {
+    border-color: var(--border-bright);
+    transform: translateY(-2px);
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .kpi-card:nth-child(1)::before { background: linear-gradient(90deg, var(--accent), transparent); }
+  .kpi-card:nth-child(2)::before { background: linear-gradient(90deg, var(--accent2), transparent); }
+  .kpi-card:nth-child(3)::before { background: linear-gradient(90deg, var(--accent3), transparent); }
+  .kpi-card:nth-child(4)::before { background: linear-gradient(90deg, var(--accent4), transparent); }
+  .kpi-icon {
+    width: 36px; height: 36px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1rem; font-size: 0.9rem;
+  }
+  .kpi-card:nth-child(1) .kpi-icon { background: var(--accent-dim); color: var(--accent); }
+  .kpi-card:nth-child(2) .kpi-icon { background: var(--accent2-dim); color: var(--accent2); }
+  .kpi-card:nth-child(3) .kpi-icon { background: var(--accent3-dim); color: var(--accent3); }
+  .kpi-card:nth-child(4) .kpi-icon { background: var(--accent4-dim); color: var(--accent4); }
+  .kpi-label {
+    font-size: 0.73rem; color: var(--muted); letter-spacing: 0.04em;
+    text-transform: uppercase; margin-bottom: 0.3rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .kpi-value {
+    font-size: 1.8rem; font-weight: 700;
+    font-family: 'DM Mono', monospace;
+    line-height: 1.1;
+  }
+  .kpi-card:nth-child(1) .kpi-value { color: var(--accent); }
+  .kpi-card:nth-child(2) .kpi-value { color: var(--accent2); }
+  .kpi-card:nth-child(3) .kpi-value { color: var(--accent3); }
+  .kpi-card:nth-child(4) .kpi-value { color: var(--accent4); }
+  .kpi-sub {
+    font-size: 0.72rem; color: var(--muted-dim); margin-top: 0.3rem;
+  }
+
+  /* CHART PANELS */
+  .charts-row {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .charts-row.two-col { grid-template-columns: 2fr 1fr; }
+  .charts-row.three-col { grid-template-columns: 1fr 1fr 1fr; }
+
+  .chart-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: border-color 0.3s;
+  }
+  .chart-panel:hover { border-color: var(--border-bright); }
+  .chart-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1.2rem;
+  }
+  .chart-title {
+    font-size: 0.82rem; font-weight: 600; letter-spacing: 0.01em;
+  }
+  .chart-badge {
+    font-family: 'DM Mono', monospace; font-size: 0.65rem;
+    background: var(--tag-bg); border: 1px solid var(--tag-border);
+    color: var(--accent); padding: 3px 10px; border-radius: 100px;
+    letter-spacing: 0.04em;
+  }
+  .chart-canvas-wrap {
+    position: relative;
+    width: 100%;
+  }
+  .chart-canvas-wrap canvas {
+    width: 100% !important;
+  }
+
+  /* DATA TABLE */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .data-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem; font-weight: 500;
+    color: var(--muted-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-align: left;
+    padding: 0 0 0.8rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table td {
+    font-size: 0.82rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    color: var(--muted);
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table .page-name {
+    color: var(--text); font-weight: 500;
+    max-width: 200px; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+  }
+  .data-table .count-val {
+    font-family: 'DM Mono', monospace;
+    color: var(--accent); font-weight: 500;
+  }
+  .bar-cell {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .mini-bar {
+    height: 5px; border-radius: 3px;
+    background: var(--accent-dim);
+    position: relative; overflow: hidden;
+    flex: 1; max-width: 80px;
+  }
+  .mini-bar-fill {
+    position: absolute; top: 0; left: 0; bottom: 0;
+    background: var(--accent); border-radius: 3px;
+    transition: width 0.6s ease;
+  }
+
+  /* EMPTY / LOADING STATES */
+  .skeleton {
+    background: linear-gradient(90deg, var(--card) 25%, var(--card-hover) 50%, var(--card) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.8s infinite;
+    border-radius: 8px;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  .empty-state {
+    text-align: center; padding: 3rem 2rem;
+  }
+  .empty-icon {
+    width: 56px; height: 56px; border-radius: 14px;
+    background: var(--accent-dim); display: inline-flex;
+    align-items: center; justify-content: center;
+    margin-bottom: 1rem;
+  }
+  .empty-icon svg { width: 24px; height: 24px; stroke: var(--accent); fill: none; stroke-width: 1.5; }
+  .empty-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .empty-sub { font-size: 0.82rem; color: var(--muted); max-width: 320px; margin: 0 auto; }
+
+  /* REFRESH INDICATOR */
+  .refresh-bar {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'DM Mono', monospace; font-size: 0.68rem;
+    color: var(--muted-dim); margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .refresh-bar button {
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--muted); padding: 4px 12px; border-radius: 6px;
+    font-family: 'DM Mono', monospace; font-size: 0.68rem;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .refresh-bar button:hover { border-color: var(--accent); color: var(--text); }
+
+  /* FOOTER */
+  footer {
+    text-align: center; padding: 2rem;
+    color: var(--muted-dim); font-size: 0.72rem;
+    border-top: 1px solid var(--border);
+    margin-top: 2rem;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* ANIMATIONS */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-in {
+    animation: fadeInUp 0.5s ease both;
+  }
+  .delay-1 { animation-delay: 0.06s; }
+  .delay-2 { animation-delay: 0.12s; }
+  .delay-3 { animation-delay: 0.18s; }
+  .delay-4 { animation-delay: 0.24s; }
+  .delay-5 { animation-delay: 0.30s; }
+  .delay-6 { animation-delay: 0.36s; }
+  .delay-7 { animation-delay: 0.42s; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .charts-row.two-col { grid-template-columns: 1fr; }
+    .charts-row.three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    nav { padding: 1rem 1.2rem; }
+    .nav-links { gap: 1rem; }
+    .dashboard-wrapper { padding: 5.5rem 1rem 2rem; }
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .kpi-value { font-size: 1.4rem; }
+    .dash-header { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><a href="/">MKK.portfolio</a></div>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="/">Portfolio</a></li>
+      <li><a href="/dashboard.html" class="active"><span class="live-dot"></span>Analytics</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="dashboard-wrapper">
+
+  <!-- HEADER -->
+  <div class="dash-header animate-in">
+    <div class="dash-title-group">
+      <p class="dash-label">// analytics dashboard</p>
+      <h1 class="dash-title">Portfolio Insights <span>/ real-time visitor data</span></h1>
+    </div>
+    <div class="period-selector">
+      <button class="period-btn" data-days="7">7D</button>
+      <button class="period-btn active" data-days="14">14D</button>
+      <button class="period-btn" data-days="30">30D</button>
+    </div>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-grid">
+    <div class="kpi-card animate-in delay-1">
+      <div class="kpi-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+      <div class="kpi-label">Total Views</div>
+      <div class="kpi-value" id="kpi-views">--</div>
+      <div class="kpi-sub" id="kpi-views-sub">loading...</div>
+    </div>
+    <div class="kpi-card animate-in delay-2">
+      <div class="kpi-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+      <div class="kpi-label">Unique Visitors</div>
+      <div class="kpi-value" id="kpi-visitors">--</div>
+      <div class="kpi-sub" id="kpi-visitors-sub">loading...</div>
+    </div>
+    <div class="kpi-card animate-in delay-3">
+      <div class="kpi-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div class="kpi-label">Avg Views / Day</div>
+      <div class="kpi-value" id="kpi-avg">--</div>
+      <div class="kpi-sub" id="kpi-avg-sub">loading...</div>
+    </div>
+    <div class="kpi-card animate-in delay-4">
+      <div class="kpi-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+      </div>
+      <div class="kpi-label">Top Country</div>
+      <div class="kpi-value" id="kpi-country" style="font-size:1.2rem;">--</div>
+      <div class="kpi-sub" id="kpi-country-sub">loading...</div>
+    </div>
+  </div>
+
+  <!-- MAIN CHART: Views Over Time -->
+  <div class="charts-row two-col">
+    <div class="chart-panel animate-in delay-5">
+      <div class="chart-header">
+        <span class="chart-title">Views Over Time</span>
+        <span class="chart-badge">daily</span>
+      </div>
+      <div class="chart-canvas-wrap">
+        <canvas id="chart-views" height="220"></canvas>
+      </div>
+    </div>
+
+    <!-- HOURLY HEATMAP -->
+    <div class="chart-panel animate-in delay-6">
+      <div class="chart-header">
+        <span class="chart-title">Hourly Activity</span>
+        <span class="chart-badge">utc</span>
+      </div>
+      <div class="chart-canvas-wrap">
+        <canvas id="chart-hourly" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECONDARY CHARTS ROW -->
+  <div class="charts-row three-col">
+
+    <!-- DEVICES -->
+    <div class="chart-panel animate-in delay-5">
+      <div class="chart-header">
+        <span class="chart-title">Devices</span>
+        <span class="chart-badge">breakdown</span>
+      </div>
+      <div class="chart-canvas-wrap" style="max-width:220px;margin:0 auto;">
+        <canvas id="chart-devices" height="220"></canvas>
+      </div>
+    </div>
+
+    <!-- TOP PAGES -->
+    <div class="chart-panel animate-in delay-6">
+      <div class="chart-header">
+        <span class="chart-title">Top Pages</span>
+        <span class="chart-badge" id="pages-count">0 pages</span>
+      </div>
+      <div id="pages-table-wrap">
+        <div class="empty-state" id="pages-empty">
+          <div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+          <p class="empty-title">No page data yet</p>
+          <p class="empty-sub">Page views will appear here once visitors start browsing your portfolio</p>
+        </div>
+        <table class="data-table" id="pages-table" style="display:none;">
+          <thead><tr><th>Page</th><th style="text-align:right;">Views</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TOP REFERRERS -->
+    <div class="chart-panel animate-in delay-7">
+      <div class="chart-header">
+        <span class="chart-title">Traffic Sources</span>
+        <span class="chart-badge" id="refs-count">0 sources</span>
+      </div>
+      <div id="refs-table-wrap">
+        <div class="empty-state" id="refs-empty">
+          <div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>
+          <p class="empty-title">No referrer data yet</p>
+          <p class="empty-sub">Traffic sources will populate as visitors arrive from different channels</p>
+        </div>
+        <table class="data-table" id="refs-table" style="display:none;">
+          <thead><tr><th>Source</th><th style="text-align:right;">Visits</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- COUNTRIES TABLE -->
+  <div class="charts-row" style="grid-template-columns:1fr;">
+    <div class="chart-panel animate-in delay-7">
+      <div class="chart-header">
+        <span class="chart-title">Visitor Geography</span>
+        <span class="chart-badge" id="countries-count">0 countries</span>
+      </div>
+      <div id="countries-table-wrap">
+        <div class="empty-state" id="countries-empty">
+          <div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+          <p class="empty-title">No location data yet</p>
+          <p class="empty-sub">Geographic distribution of visitors will be shown here</p>
+        </div>
+        <table class="data-table" id="countries-table" style="display:none;">
+          <thead><tr><th>Country</th><th>Visits</th><th style="width:120px;">Share</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="refresh-bar">
+    <span id="last-updated">Last updated: --</span>
+    <button onclick="loadData()">Refresh</button>
+  </div>
+
+</div>
+
+<footer>
+  <p>Analytics for <a href="/">MKK Portfolio</a> &middot; Powered by Netlify &middot; Data stored with Netlify Blobs</p>
+</footer>
+
+<script>
+(function() {
+  // Track this page view too
+  try {
+    fetch('/api/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        page: '/dashboard',
+        referrer: document.referrer || '',
+        screen: screen.width + 'x' + screen.height,
+        language: navigator.language || ''
+      })
+    }).catch(function(){});
+  } catch(e) {}
+})();
+
+let currentDays = 14;
+let viewsChart = null;
+let hourlyChart = null;
+let devicesChart = null;
+
+// Chart.js defaults
+Chart.defaults.color = '#8884a8';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
+Chart.defaults.font.family = "'DM Mono', monospace";
+Chart.defaults.font.size = 11;
+
+// Period buttons
+document.querySelectorAll('.period-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.period-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    currentDays = parseInt(btn.dataset.days, 10);
+    loadData();
+  });
+});
+
+async function loadData() {
+  try {
+    var res = await fetch('/api/analytics?days=' + currentDays);
+    var data = await res.json();
+    renderDashboard(data);
+    document.getElementById('last-updated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+  } catch(err) {
+    console.error('Failed to load analytics:', err);
+  }
+}
+
+function renderDashboard(data) {
+  // KPI cards
+  var el = document.getElementById('kpi-views');
+  el.textContent = formatNum(data.totalViews);
+  document.getElementById('kpi-views-sub').textContent = 'across ' + currentDays + ' days';
+
+  document.getElementById('kpi-visitors').textContent = formatNum(data.totalVisitors);
+  document.getElementById('kpi-visitors-sub').textContent = currentDays + '-day period';
+
+  document.getElementById('kpi-avg').textContent = formatNum(data.avgViewsPerDay);
+  document.getElementById('kpi-avg-sub').textContent = 'per active day';
+
+  var topCountry = data.topCountries && data.topCountries.length > 0 ? data.topCountries[0] : null;
+  document.getElementById('kpi-country').textContent = topCountry ? topCountry[0] : 'N/A';
+  document.getElementById('kpi-country-sub').textContent = topCountry ? formatNum(topCountry[1]) + ' visits' : 'no data yet';
+
+  // Views chart
+  renderViewsChart(data.daily);
+
+  // Hourly chart
+  renderHourlyChart(data.hourly);
+
+  // Devices chart
+  renderDevicesChart(data.screens);
+
+  // Pages table
+  renderTable('pages', data.topPages, 'pages');
+
+  // Referrers table
+  renderTable('refs', data.topReferrers, 'sources');
+
+  // Countries table
+  renderCountriesTable(data.topCountries, data.totalViews);
+}
+
+function renderViewsChart(daily) {
+  var ctx = document.getElementById('chart-views').getContext('2d');
+  var labels = daily.map(function(d) {
+    var parts = d.date.split('-');
+    return parts[1] + '/' + parts[2];
+  });
+  var views = daily.map(function(d) { return d.views; });
+  var visitors = daily.map(function(d) { return d.visitors; });
+
+  if (viewsChart) viewsChart.destroy();
+
+  viewsChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Views',
+          data: views,
+          borderColor: '#7c6cfa',
+          backgroundColor: 'rgba(124,108,250,0.08)',
+          fill: true,
+          tension: 0.35,
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: '#7c6cfa',
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 2,
+        },
+        {
+          label: 'Visitors',
+          data: visitors,
+          borderColor: '#36d5a8',
+          backgroundColor: 'rgba(54,213,168,0.05)',
+          fill: true,
+          tension: 0.35,
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: '#36d5a8',
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 2,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          position: 'top',
+          align: 'end',
+          labels: { boxWidth: 8, boxHeight: 8, usePointStyle: true, pointStyle: 'circle', padding: 16, font: { size: 11 } }
+        },
+        tooltip: {
+          backgroundColor: '#1c1c28',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          titleFont: { weight: '600' },
+          padding: 12,
+          cornerRadius: 10,
+          displayColors: true,
+          boxPadding: 4,
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { maxRotation: 0, maxTicksLimit: 8, font: { size: 10 } }
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(255,255,255,0.03)' },
+          ticks: { stepSize: 1, font: { size: 10 } }
+        }
+      }
+    }
+  });
+}
+
+function renderHourlyChart(hourly) {
+  var ctx = document.getElementById('chart-hourly').getContext('2d');
+  var labels = [];
+  var values = [];
+  for (var i = 0; i < 24; i++) {
+    labels.push(i.toString().padStart(2, '0'));
+    values.push(hourly[i.toString()] || 0);
+  }
+
+  if (hourlyChart) hourlyChart.destroy();
+
+  var maxVal = Math.max.apply(null, values) || 1;
+  var colors = values.map(function(v) {
+    var intensity = v / maxVal;
+    return 'rgba(124,108,250,' + (0.15 + intensity * 0.7) + ')';
+  });
+
+  hourlyChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Visits',
+        data: values,
+        backgroundColor: colors,
+        borderRadius: 4,
+        borderSkipped: false,
+        barThickness: 8,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1c1c28',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          padding: 10,
+          cornerRadius: 8,
+          callbacks: {
+            title: function(items) { return items[0].label + ':00 UTC'; }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { maxTicksLimit: 12, font: { size: 9 } }
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(255,255,255,0.03)' },
+          ticks: { stepSize: 1, font: { size: 10 } }
+        }
+      }
+    }
+  });
+}
+
+function renderDevicesChart(screens) {
+  var ctx = document.getElementById('chart-devices').getContext('2d');
+  var labels = Object.keys(screens);
+  var values = Object.values(screens);
+
+  if (labels.length === 0) {
+    labels = ['No data'];
+    values = [1];
+  }
+
+  if (devicesChart) devicesChart.destroy();
+
+  var palette = ['#7c6cfa', '#36d5a8', '#f0884a', '#e06c9a', '#56a0f5'];
+
+  devicesChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: values,
+        backgroundColor: palette.slice(0, labels.length),
+        borderColor: '#16161f',
+        borderWidth: 3,
+        hoverOffset: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      cutout: '68%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 8, boxHeight: 8, usePointStyle: true, pointStyle: 'circle', padding: 12, font: { size: 11 } }
+        },
+        tooltip: {
+          backgroundColor: '#1c1c28',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          padding: 10,
+          cornerRadius: 8,
+        }
+      }
+    }
+  });
+}
+
+function renderTable(prefix, entries, noun) {
+  var countEl = document.getElementById(prefix + '-count');
+  var emptyEl = document.getElementById(prefix + '-empty');
+  var tableEl = document.getElementById(prefix + '-table');
+  var tbody = tableEl.querySelector('tbody');
+
+  if (!entries || entries.length === 0) {
+    countEl.textContent = '0 ' + noun;
+    emptyEl.style.display = '';
+    tableEl.style.display = 'none';
+    return;
+  }
+
+  countEl.textContent = entries.length + ' ' + noun;
+  emptyEl.style.display = 'none';
+  tableEl.style.display = '';
+
+  var maxVal = entries[0][1];
+  tbody.innerHTML = entries.map(function(entry) {
+    var name = entry[0];
+    var val = entry[1];
+    var pct = maxVal > 0 ? Math.round((val / maxVal) * 100) : 0;
+    return '<tr>' +
+      '<td class="page-name">' + escapeHtml(name) + '</td>' +
+      '<td style="text-align:right;" class="bar-cell">' +
+        '<div class="mini-bar"><div class="mini-bar-fill" style="width:' + pct + '%"></div></div>' +
+        '<span class="count-val">' + formatNum(val) + '</span>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+function renderCountriesTable(countries, totalViews) {
+  var countEl = document.getElementById('countries-count');
+  var emptyEl = document.getElementById('countries-empty');
+  var tableEl = document.getElementById('countries-table');
+  var tbody = tableEl.querySelector('tbody');
+
+  if (!countries || countries.length === 0) {
+    countEl.textContent = '0 countries';
+    emptyEl.style.display = '';
+    tableEl.style.display = 'none';
+    return;
+  }
+
+  countEl.textContent = countries.length + ' countries';
+  emptyEl.style.display = 'none';
+  tableEl.style.display = '';
+
+  var maxVal = countries[0][1];
+  tbody.innerHTML = countries.map(function(entry) {
+    var name = entry[0];
+    var val = entry[1];
+    var pct = totalViews > 0 ? ((val / totalViews) * 100).toFixed(1) : 0;
+    var barPct = maxVal > 0 ? Math.round((val / maxVal) * 100) : 0;
+    return '<tr>' +
+      '<td class="page-name">' + escapeHtml(name) + '</td>' +
+      '<td class="count-val">' + formatNum(val) + '</td>' +
+      '<td>' +
+        '<div class="bar-cell">' +
+          '<div class="mini-bar" style="max-width:60px"><div class="mini-bar-fill" style="width:' + barPct + '%;background:var(--accent2)"></div></div>' +
+          '<span style="font-size:0.72rem;color:var(--muted)">' + pct + '%</span>' +
+        '</div>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+function formatNum(n) {
+  if (n == null || isNaN(n)) return '0';
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+  return n.toString();
+}
+
+function escapeHtml(str) {
+  var d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// Initial load
+loadData();
+</script>
+
+</body>
+</html>

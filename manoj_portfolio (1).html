@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Manoj Kumar Kurma | Business & Data Analyst</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --card: #16161f;
+    --border: rgba(255,255,255,0.07);
+    --accent: #7c6cfa;
+    --accent2: #36d5a8;
+    --accent3: #f0884a;
+    --text: #f0effe;
+    --muted: #8884a8;
+    --tag-bg: rgba(124,108,250,0.12);
+    --tag-border: rgba(124,108,250,0.3);
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 3rem;
+    background: rgba(10,10,15,0.8);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem; color: var(--accent); letter-spacing: 0.06em;
+  }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.82rem; color: var(--muted); text-decoration: none;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 7rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-glow {
+    position: absolute; width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(124,108,250,0.13) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%, -55%);
+    pointer-events: none;
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: 760px; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--tag-bg); border: 1px solid var(--tag-border);
+    border-radius: 100px; padding: 6px 16px;
+    font-family: 'DM Mono', monospace; font-size: 0.72rem;
+    color: var(--accent); letter-spacing: 0.08em; margin-bottom: 2rem;
+  }
+  .hero-badge span.dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent2); display: inline-block;
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .hero h1 {
+    font-size: clamp(2.6rem, 6vw, 4.2rem);
+    font-weight: 700; line-height: 1.13; letter-spacing: -0.02em;
+    margin-bottom: 1.2rem;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero-sub {
+    font-size: 1.08rem; color: var(--muted); max-width: 540px;
+    margin: 0 auto 2.5rem; font-weight: 300;
+  }
+  .hero-ctas { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--accent); color: #fff;
+    padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;
+    font-size: 0.9rem; text-decoration: none; letter-spacing: 0.02em;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-2px); }
+  .btn-outline {
+    border: 1px solid var(--border); color: var(--muted);
+    padding: 0.75rem 2rem; border-radius: 10px; font-weight: 500;
+    font-size: 0.9rem; text-decoration: none;
+    transition: border-color 0.2s, color 0.2s, transform 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--text); transform: translateY(-2px); }
+
+  /* ── SECTIONS ── */
+  section { padding: 6rem 2rem; }
+  .container { max-width: 1000px; margin: 0 auto; }
+  .section-label {
+    font-family: 'DM Mono', monospace; font-size: 0.72rem;
+    color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+  .section-title {
+    font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 700;
+    letter-spacing: -0.02em; margin-bottom: 3rem; line-height: 1.2;
+  }
+
+  /* ── ABOUT ── */
+  #about { background: var(--surface); }
+  .about-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;
+    align-items: start;
+  }
+  .about-text p { color: var(--muted); margin-bottom: 1rem; font-size: 0.97rem; }
+  .about-text p strong { color: var(--text); }
+  .info-list { list-style: none; margin-top: 1.5rem; }
+  .info-list li {
+    display: flex; gap: 10px; align-items: flex-start;
+    color: var(--muted); font-size: 0.88rem; margin-bottom: 0.7rem;
+  }
+  .info-list li .icon { color: var(--accent); font-size: 1rem; min-width: 18px; }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.4rem;
+  }
+  .stat-card .num {
+    font-size: 2rem; font-weight: 700; color: var(--accent);
+    font-family: 'DM Mono', monospace;
+  }
+  .stat-card .label { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+
+  /* ── SKILLS ── */
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1.2rem; }
+  .skill-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.5rem;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .skill-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+  .skill-card .sk-icon {
+    width: 42px; height: 42px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; margin-bottom: 1rem;
+  }
+  .sk-purple { background: rgba(124,108,250,0.15); }
+  .sk-teal { background: rgba(54,213,168,0.15); }
+  .sk-orange { background: rgba(240,136,74,0.15); }
+  .sk-blue { background: rgba(56,163,255,0.15); }
+  .skill-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.6rem; }
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0.8rem; }
+  .stag {
+    font-size: 0.72rem; font-family: 'DM Mono', monospace;
+    background: var(--tag-bg); border: 1px solid var(--tag-border);
+    color: var(--accent); padding: 3px 10px; border-radius: 100px;
+  }
+
+  /* ── PROJECTS ── */
+  #projects { background: var(--surface); }
+  .projects-grid { display: grid; gap: 1.5rem; }
+  .proj-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 18px; padding: 2rem;
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 1.5rem; align-items: start;
+    transition: border-color 0.2s;
+  }
+  .proj-card:hover { border-color: rgba(124,108,250,0.4); }
+  .proj-num {
+    font-family: 'DM Mono', monospace; font-size: 0.72rem;
+    color: var(--accent); letter-spacing: 0.08em; margin-bottom: 0.6rem;
+  }
+  .proj-card h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.8rem; }
+  .proj-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
+  .proj-bullets { margin-top: 1rem; padding-left: 0; list-style: none; }
+  .proj-bullets li {
+    color: var(--muted); font-size: 0.88rem; padding: 4px 0;
+    padding-left: 1.2rem; position: relative;
+  }
+  .proj-bullets li::before {
+    content: '→'; position: absolute; left: 0;
+    color: var(--accent2); font-size: 0.8rem;
+  }
+  .proj-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 1rem; }
+  .ptag {
+    font-size: 0.71rem; padding: 4px 12px; border-radius: 100px;
+    font-family: 'DM Mono', monospace;
+  }
+  .ptag-purple { background: rgba(124,108,250,0.12); color: #a898ff; border: 1px solid rgba(124,108,250,0.25); }
+  .ptag-teal { background: rgba(54,213,168,0.1); color: #36d5a8; border: 1px solid rgba(54,213,168,0.25); }
+  .ptag-orange { background: rgba(240,136,74,0.1); color: #f0884a; border: 1px solid rgba(240,136,74,0.25); }
+  .proj-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; flex-shrink: 0;
+  }
+
+  /* ── EXPERIENCE ── */
+  .exp-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 18px; padding: 2rem;
+    transition: border-color 0.2s;
+  }
+  .exp-card:hover { border-color: rgba(54,213,168,0.35); }
+  .exp-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.2rem; }
+  .exp-company { font-size: 0.8rem; color: var(--accent2); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .exp-role { font-size: 1.1rem; font-weight: 600; }
+  .exp-duration {
+    font-size: 0.78rem; font-family: 'DM Mono', monospace;
+    background: rgba(54,213,168,0.1); border: 1px solid rgba(54,213,168,0.25);
+    color: var(--accent2); padding: 4px 14px; border-radius: 100px;
+    white-space: nowrap;
+  }
+  .exp-bullets { list-style: none; padding: 0; }
+  .exp-bullets li {
+    color: var(--muted); font-size: 0.9rem; padding: 5px 0;
+    padding-left: 1.4rem; position: relative;
+  }
+  .exp-bullets li::before {
+    content: '▸'; position: absolute; left: 0;
+    color: var(--accent2); font-size: 0.75rem; top: 6px;
+  }
+
+  /* ── EDUCATION ── */
+  #education { background: var(--surface); }
+  .edu-timeline { position: relative; padding-left: 2rem; }
+  .edu-timeline::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 2px; background: linear-gradient(to bottom, var(--accent), var(--accent2), transparent);
+    border-radius: 2px;
+  }
+  .edu-item { position: relative; margin-bottom: 2.5rem; }
+  .edu-item::before {
+    content: ''; position: absolute; left: -2.45rem; top: 6px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); border: 2px solid var(--bg);
+    box-shadow: 0 0 0 3px rgba(124,108,250,0.3);
+  }
+  .edu-year { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--accent); letter-spacing: 0.08em; margin-bottom: 4px; }
+  .edu-degree { font-size: 1.05rem; font-weight: 600; margin-bottom: 2px; }
+  .edu-inst { color: var(--muted); font-size: 0.88rem; }
+  .edu-grade { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--accent2); margin-top: 4px; }
+
+  /* ── CERTIFICATIONS ── */
+  .cert-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .cert-chip {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1rem 1.4rem;
+    transition: border-color 0.2s;
+  }
+  .cert-chip:hover { border-color: var(--accent); }
+  .cert-chip .ci { font-size: 1.3rem; }
+  .cert-chip .cn { font-size: 0.88rem; font-weight: 600; }
+  .cert-chip .cp { font-size: 0.75rem; color: var(--muted); }
+
+  /* ── CONTACT ── */
+  #contact {
+    text-align: center;
+    background: var(--surface);
+    position: relative; overflow: hidden;
+  }
+  .contact-glow {
+    position: absolute; width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(54,213,168,0.08) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .contact-inner { position: relative; z-index: 1; }
+  .contact-links { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem; }
+  .contact-link {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 0.9rem 1.6rem;
+    color: var(--muted); text-decoration: none; font-size: 0.88rem;
+    transition: border-color 0.2s, color 0.2s, transform 0.2s;
+  }
+  .contact-link:hover { border-color: var(--accent); color: var(--text); transform: translateY(-3px); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center; padding: 2rem;
+    color: var(--muted); font-size: 0.78rem;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 700px) {
+    nav { padding: 1rem 1.2rem; }
+    .nav-links { gap: 1.2rem; }
+    .about-grid { grid-template-columns: 1fr; }
+    .proj-card { grid-template-columns: 1fr; }
+    .proj-icon { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">MKK.portfolio</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-badge"><span class="dot"></span> Open to Opportunities</div>
+    <h1>Kurma <span>Manoj Kumar</span></h1>
+    <p class="hero-sub">MBA Business Analytics candidate who transforms messy data into sharp decisions — through dashboards, models, and strategic insight.</p>
+    <div class="hero-ctas">
+      <a href="#projects" class="btn-primary">View Projects</a>
+      <a href="#contact" class="btn-outline">Get in Touch</a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <p class="section-label">// about me</p>
+    <h2 class="section-title">Data meets strategy</h2>
+    <div class="about-grid">
+      <div class="about-text">
+        <p>I'm a <strong>Business Analytics MBA candidate</strong> at Anurag University with a B.Sc. in Computer Science. I specialize in turning raw datasets into actionable insights that drive real decisions.</p>
+        <p>My experience spans <strong>healthcare data analysis, survey analytics, and property management performance systems</strong> — building Power BI dashboards, machine learning models, and KPI frameworks from the ground up.</p>
+        <p>I bring both technical depth (Python, SQL, Power BI) and business acumen to every problem — making me effective at the intersection of data and decision-making.</p>
+        <ul class="info-list">
+          <li><span class="icon">📍</span> Mirzapur, Kamareddy, Telangana – 503187</li>
+          <li><span class="icon">📞</span> +91 86883 49056</li>
+          <li><span class="icon">✉️</span> manojkumarkurma741@gmail.com</li>
+          <li><span class="icon">🔗</span> linkedin.com/in/manoj-kumar-kurma-b8a2b6351</li>
+        </ul>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="num">3+</div>
+          <div class="label">Analytics Projects Completed</div>
+        </div>
+        <div class="stat-card">
+          <div class="num">4K+</div>
+          <div class="label">Survey Records Analyzed</div>
+        </div>
+        <div class="stat-card">
+          <div class="num">3</div>
+          <div class="label">Months Industry Internship</div>
+        </div>
+        <div class="stat-card">
+          <div class="num">7.51</div>
+          <div class="label">CGPA — B.Sc. Degree</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="container">
+    <p class="section-label">// technical skills</p>
+    <h2 class="section-title">Tools & Technologies</h2>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="sk-icon sk-purple">📊</div>
+        <h3>Analytics & BI</h3>
+        <p style="color:var(--muted);font-size:0.85rem;">Building interactive dashboards and tracking KPIs to surface actionable insights.</p>
+        <div class="skill-tags">
+          <span class="stag">Power BI</span>
+          <span class="stag">MS Excel</span>
+          <span class="stag">PivotTables</span>
+          <span class="stag">VLOOKUP</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="sk-icon sk-teal">🐍</div>
+        <h3>Programming</h3>
+        <p style="color:var(--muted);font-size:0.85rem;">Writing clean analytical scripts for data wrangling, EDA, and model building.</p>
+        <div class="skill-tags">
+          <span class="stag">Python</span>
+          <span class="stag">Pandas</span>
+          <span class="stag">NumPy</span>
+          <span class="stag">Matplotlib</span>
+          <span class="stag">SQL</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="sk-icon sk-orange">🤖</div>
+        <h3>Machine Learning</h3>
+        <p style="color:var(--muted);font-size:0.85rem;">Applying predictive models to solve real-world business classification problems.</p>
+        <div class="skill-tags">
+          <span class="stag">Logistic Regression</span>
+          <span class="stag">Random Forest</span>
+          <span class="stag">Feature Engineering</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="sk-icon sk-blue">🧠</div>
+        <h3>Data Analysis</h3>
+        <p style="color:var(--muted);font-size:0.85rem;">End-to-end pipeline from data cleaning and EDA to recommendations and storytelling.</p>
+        <div class="skill-tags">
+          <span class="stag">Data Cleaning</span>
+          <span class="stag">EDA</span>
+          <span class="stag">KPI Tracking</span>
+          <span class="stag">Model Building</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="container">
+    <p class="section-label">// academic projects</p>
+    <h2 class="section-title">What I've Built</h2>
+    <div class="projects-grid">
+
+      <div class="proj-card">
+        <div>
+          <p class="proj-num">PROJECT 01</p>
+          <h3>Healthcare Data Analysis</h3>
+          <p>Survey-based hospital data analysis to optimize resource allocation and reduce costs through data-driven decisions in healthcare management.</p>
+          <ul class="proj-bullets">
+            <li>Conducted survey-based data collection and performed hospital data analysis</li>
+            <li>Performed data cleaning, EDA and built interactive Power BI dashboard</li>
+            <li>Recommended strategies for hospital resource optimization and cost management</li>
+            <li>Generated insights supporting data-driven decision making in healthcare systems</li>
+          </ul>
+          <div class="proj-tags">
+            <span class="ptag ptag-purple">Python</span>
+            <span class="ptag ptag-teal">Power BI</span>
+            <span class="ptag ptag-orange">EDA</span>
+            <span class="ptag ptag-purple">Data Cleaning</span>
+          </div>
+        </div>
+        <div class="proj-icon sk-teal">🏥</div>
+      </div>
+
+      <div class="proj-card">
+        <div>
+          <p class="proj-num">PROJECT 02</p>
+          <h3>BRFSS Health Survey Data Analysis</h3>
+          <p>In-depth analysis of U.S. Behavioral Risk Factor Surveillance System data with 4,000+ records to predict diabetes risk and identify regional health patterns.</p>
+          <ul class="proj-bullets">
+            <li>Cleaned and preprocessed 4,000+ survey records; identified habit–disease correlations</li>
+            <li>Applied logistic regression model for diabetes risk prediction with regional analysis</li>
+            <li>Created Power BI dashboard for smoking, drinking, and chronic disease prevention insights</li>
+            <li>Suggested targeted interventions for high-risk demographics</li>
+          </ul>
+          <div class="proj-tags">
+            <span class="ptag ptag-purple">Logistic Regression</span>
+            <span class="ptag ptag-teal">Power BI</span>
+            <span class="ptag ptag-orange">Python</span>
+            <span class="ptag ptag-purple">Regional Analysis</span>
+          </div>
+        </div>
+        <div class="proj-icon sk-purple">📋</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="container">
+    <p class="section-label">// work experience</p>
+    <h2 class="section-title">Industry Experience</h2>
+    <div class="exp-card">
+      <div class="exp-header">
+        <div>
+          <p class="exp-company">EKA NETWORK SOLUTIONS</p>
+          <p class="exp-role">Business Analyst Intern — Property Management</p>
+        </div>
+        <span class="exp-duration">3 Months</span>
+      </div>
+      <ul class="exp-bullets">
+        <li>Conducted detailed overview of landlord performance across key financial and operational metrics</li>
+        <li>Performed data cleaning, EDA, and identified correlations between rent collection, tenant satisfaction, operating expenses, and maintenance</li>
+        <li>Applied feature engineering: performance score, NOI, ROI, maintenance efficiency, and performance class</li>
+        <li>Built a Random Forest classification model to predict landlord performance class for managed units</li>
+        <li>Created a success metrics dashboard and performance dashboard for actionable insights for users and landlords</li>
+      </ul>
+      <div class="proj-tags" style="margin-top:1.2rem;">
+        <span class="ptag ptag-purple">Random Forest</span>
+        <span class="ptag ptag-teal">Feature Engineering</span>
+        <span class="ptag ptag-orange">Power BI</span>
+        <span class="ptag ptag-purple">EDA</span>
+        <span class="ptag ptag-teal">ROI / NOI Analysis</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="container">
+    <p class="section-label">// education</p>
+    <h2 class="section-title">Academic Background</h2>
+    <div class="edu-timeline">
+
+      <div class="edu-item">
+        <p class="edu-year">OCT 2024 — PRESENT</p>
+        <p class="edu-degree">M.B.A. in Business Analytics <span style="color:var(--muted);font-weight:400;">(Pursuing)</span></p>
+        <p class="edu-inst">Anurag University</p>
+        <p class="edu-grade">Specialization: Business Analytics</p>
+      </div>
+
+      <div class="edu-item">
+        <p class="edu-year">SEP 2021 — JUN 2024</p>
+        <p class="edu-degree">B.Sc. — Computer Hardware & Computer Science</p>
+        <p class="edu-inst">Nizam College</p>
+        <p class="edu-grade">CGPA: 7.51</p>
+      </div>
+
+      <div class="edu-item">
+        <p class="edu-year">JUL 2019 — MAR 2021</p>
+        <p class="edu-degree">Intermediate — MPC</p>
+        <p class="edu-inst">SR Junior College</p>
+        <p class="edu-grade">Score: 980</p>
+      </div>
+
+      <div class="edu-item">
+        <p class="edu-year">JUN 2018 — APR 2019</p>
+        <p class="edu-degree">SSC (10th Grade)</p>
+        <p class="edu-inst">Sri Vijaya Sai High School</p>
+        <p class="edu-grade">CGPA: 9.5</p>
+      </div>
+
+    </div>
+
+    <!-- Certifications -->
+    <p class="section-label" style="margin-top:3rem;">// certifications</p>
+    <h3 style="font-size:1.4rem;font-weight:600;margin-bottom:1.5rem;letter-spacing:-0.01em;">Credentials</h3>
+    <div class="cert-row">
+      <div class="cert-chip">
+        <span class="ci">📗</span>
+        <div>
+          <p class="cn">MS Excel</p>
+          <p class="cp">Great Learning</p>
+        </div>
+      </div>
+      <div class="cert-chip">
+        <span class="ci">📊</span>
+        <div>
+          <p class="cn">Power BI</p>
+          <p class="cp">Office Master</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-glow"></div>
+  <div class="container">
+    <div class="contact-inner">
+      <p class="section-label">// let's connect</p>
+      <h2 class="section-title" style="margin-bottom:1rem;">Ready to collaborate?</h2>
+      <p style="color:var(--muted);max-width:480px;margin:0 auto;font-size:0.97rem;">I'm actively looking for Business Analyst or Data Analyst opportunities. Let's talk about how I can bring data-driven value to your team.</p>
+      <div class="contact-links">
+        <a href="mailto:manojkumarkurma741@gmail.com" class="contact-link">✉️ Email Me</a>
+        <a href="https://www.linkedin.com/in/manoj-kumar-kurma-b8a2b6351" target="_blank" class="contact-link">🔗 LinkedIn</a>
+        <a href="tel:+918688349056" class="contact-link">📞 Call Me</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Kurma Manoj Kumar &nbsp;·&nbsp; Business & Data Analyst &nbsp;·&nbsp; Built with passion 🚀</p>
+</footer>
+
+</body>
+</html>
